@@ -14,9 +14,7 @@ task={"cp":80,"mem":60,"stgIO":60,"netIO":60}
 num_machines=len(machines)
 print(task)
 
-# %% [markdown]
 # ## Machine type assignment - with CP-Sat solver 02
-
 # %%
 # =============Create the solver
 model = cp_model.CpModel()
@@ -41,21 +39,12 @@ if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
 
 # %% [markdown]
 # ## Machine type assignment - with CP-Sat solver
-# 
-
-# %%
-
-
 # =============Create the solver
 model = cp_model.CpModel()
-
-
 #===========create decision varibles, x[i] indicate if it fit to the task  >1>  or not <0>
 x=[]
 for i in range(num_machines):
     x.append(model.NewBoolVar(f'x[{i}]'))
-
-
 
 #===============define constraints
 #only one machine will be assigned
@@ -69,7 +58,6 @@ model.Add(sum(machines[i]['mem']*x[i] for i in range(num_machines))>=task['mem']
 model.Add(sum(machines[i]['stgIO']*x[i] for i in range(num_machines))>=task['stgIO'] )
 #netIO constraint
 model.Add(sum(machines[i]['netIO']*x[i] for i in range(num_machines))>=task['netIO'] )
-
 
 #===============deinf objective
 model.Minimize(sum(x[i]*machines[i]['cost'] for i in range(num_machines)))
@@ -86,10 +74,13 @@ if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
 else:
     print("No Optimal or Feasible solution")
 
+
+
+
+
+
 # %% [markdown]
 # ## Machine type assignment - with LP solver 
-
-# %%
 
 # =============Create the mip solver with the SCIP backend.
 solver = pywraplp.Solver.CreateSolver('SCIP')
@@ -98,7 +89,6 @@ solver = pywraplp.Solver.CreateSolver('SCIP')
 x={}
 for i in range(num_machines):
     x[i]=solver.IntVar(0,1,'')
-
 
 #===============define constraints
 #only one machine will be assigned
@@ -118,7 +108,6 @@ solver.Add(solver.Sum(machines[i]['netIO']*x[i] for i in range(num_machines))>=t
 
 solver.Minimize(solver.Sum(x[i]*machines[i]['cost'] for i in range(num_machines)))
 status=solver.Solve()
-
 
 # Print solution.
 if status == pywraplp.Solver.OPTIMAL or status == pywraplp.Solver.FEASIBLE:
@@ -155,12 +144,9 @@ solver.Add(solver.Sum(machines[i]['stgIO']*x[i] for i in range(num_machines))>=t
 #netIO constraint
 solver.Add(solver.Sum(machines[i]['netIO']*x[i] for i in range(num_machines))>=task['netIO'] )
 
-
 #===============deinf objective
-
 solver.Minimize(solver.Sum(x[i]*machines[i]['cost'] for i in range(num_machines)))
 status=solver.Solve()
-
 
 # Print solution.
 if status == pywraplp.Solver.OPTIMAL or status == pywraplp.Solver.FEASIBLE:
@@ -171,16 +157,9 @@ else:
     print("No Optimal or Feasible solution")
 
 
-# %%
-
-
 
 # %%
-
-
-
-# %%
-
+# Example of assignment from or-tools
 from ortools.linear_solver import pywraplp
 
 def main():
@@ -242,11 +221,5 @@ if __name__ == '__main__':
     main()
 
 
-# %%
-
-
 
 # %%
-
-
-
